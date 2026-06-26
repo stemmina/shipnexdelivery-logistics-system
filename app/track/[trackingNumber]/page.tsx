@@ -1,12 +1,12 @@
-import { getShipmentByTrackingNumber } from "@/lib/shipment-service"
-import { TrackingDetails } from "@/components/track/tracking-details"
-import { TrackingSearch } from "@/components/tracking-search"
-import { notFound } from "next/navigation"
 import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
-import { ArrowLeft } from "lucide-react"
+import { TrackingDetails } from "@/components/track/tracking-details"
+import { TrackingSearch } from "@/components/tracking-search"
+import { getShipmentByTrackingNumber } from "@/lib/shipment-service"
+import { notFound } from "next/navigation"
 
 interface TrackPageProps {
   params: Promise<{
@@ -37,15 +37,11 @@ export default async function TrackPage({ params }: TrackPageProps) {
       <main className="flex-1">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:py-12">
           <div className="mb-8 flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              render={
-                <Link href="/">
-                  <ArrowLeft className="size-4" />
-                </Link>
-              }
-            />
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/">
+                <ArrowLeft className="size-4" />
+              </Link>
+            </Button>
             <div className="flex-1">
               <h1 className="text-3xl font-bold tracking-tight">Track Your Shipment</h1>
               <p className="text-muted-foreground">Real-time updates on your delivery</p>

@@ -1,6 +1,6 @@
 import { getShipmentById } from "@/lib/shipment-service"
 import { notFound } from "next/navigation"
-import { ArrowLeft, MapPin, Truck, Calendar, FileText } from "lucide-react"
+import { ArrowLeft, MapPin, Calendar, FileText } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
@@ -37,12 +37,18 @@ export default async function ShipmentDetailPage({ params }: ShipmentDetailPageP
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" render={<Link href="/admin/shipments"><ArrowLeft className="size-4" /></Link>} />
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/admin/shipments">
+            <ArrowLeft className="size-4" />
+          </Link>
+        </Button>
         <div className="flex-1">
           <h1 className="text-3xl font-bold tracking-tight">{shipment.tracking_number}</h1>
           <p className="text-muted-foreground">Shipment details and tracking information</p>
         </div>
-        <Button render={<Link href={`/admin/shipments/${id}/edit`}>Edit</Link>} />
+        <Button asChild>
+          <Link href={`/admin/shipments/${id}/edit`}>Edit</Link>
+        </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">

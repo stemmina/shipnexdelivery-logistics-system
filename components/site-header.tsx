@@ -16,9 +16,15 @@ export function SiteHeader() {
         </Link>
 
         <nav className="flex items-center gap-1 sm:gap-2">
-          <Button variant="ghost" size="sm" render={<Link href="/#how-it-works">How it works</Link>} />
-          <Button variant="ghost" size="sm" render={<Link href="/#track">Track</Link>} />
-          <Button variant="outline" size="sm" render={<Link href="/admin">Admin</Link>} />
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/#how-it-works">How it works</Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/#track">Track</Link>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/admin">Admin</Link>
+          </Button>
         </nav>
       </div>
     </header>

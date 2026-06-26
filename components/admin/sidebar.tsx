@@ -5,6 +5,9 @@ import { usePathname } from "next/navigation"
 import { Package, LayoutDashboard, Truck, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useTransition } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { useRouter } from "next/navigation"
 
 const NAV_ITEMS = [
   {
@@ -21,6 +24,14 @@ const NAV_ITEMS = [
 
 export function AdminSidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+
+  const handleSignOut = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push("/auth/login")
+  }
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-dvh w-64 border-r border-border bg-card">
@@ -59,22 +70,14 @@ export function AdminSidebar() {
       </nav>
 
       <div className="border-t border-border p-4">
-        <form
-          action={async () => {
-            "use server"
-            const { createClient } = await import("@/lib/supabase/server")
-            const supabase = await createClient()
-            await supabase.auth.signOut()
-          }}
+        <button
+          onClick={() => startTransition(handleSignOut)}
+          disabled={isPending}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
         >
-          <button
-            type="submit"
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-          >
-            <LogOut className="size-4" />
-            Sign out
-          </button>
-        </form>
+          <LogOut className="size-4" />
+          Sign out
+        </button>
       </div>
     </aside>
   )

@@ -38,11 +38,12 @@ export default function AdminDashboard() {
             <p className="text-sm text-muted-foreground">Get started managing your shipments.</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button render={<Link href="/admin/shipments">View all shipments</Link>} />
-            <Button
-              variant="outline"
-              render={<Link href="/admin/shipments/new">Create new shipment</Link>}
-            />
+            <Button asChild>
+              <Link href="/admin/shipments">View all shipments</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/admin/shipments/new">Create new shipment</Link>
+            </Button>
           </div>
         </div>
       </div>
