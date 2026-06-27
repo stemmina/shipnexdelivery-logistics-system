@@ -26,7 +26,7 @@ export function TrackingSearch({ initialValue = "" }: TrackingSearchProps) {
     }
 
     setLoading(true)
-    router.push(`/track/${encodeURIComponent(trackingNumber.toUpperCase())}")
+    router.push(`/track/${encodeURIComponent(trackingNumber.toUpperCase())}`)
   }
 
   return (
