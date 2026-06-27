@@ -2,11 +2,11 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
-import { Shipment } from "@/lib/shipment-service"
+import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ShipmentTable } from "@/components/admin/shipment-table"
 import { ShipmentFilters } from "@/components/admin/shipment-filters"
-import { Plus } from "lucide-react"
+import { Shipment } from "@/lib/shipment-service"
 
 interface ShipmentsListProps {
   shipments: Shipment[]
@@ -37,8 +37,11 @@ export function ShipmentsList({ shipments }: ShipmentsListProps) {
           <h1 className="text-3xl font-bold tracking-tight">Shipments</h1>
           <p className="text-muted-foreground">Manage and track all shipments.</p>
         </div>
-        <Button render={<Link href="/admin/shipments/new">Create shipment</Link>}>
-          <Plus className="size-4" />
+        <Button asChild>
+          <Link href="/admin/shipments/new">
+            <Plus className="size-4" />
+            Create shipment
+          </Link>
         </Button>
       </div>
 
