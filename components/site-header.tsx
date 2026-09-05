@@ -1,5 +1,5 @@
+import Image from "next/image"
 import Link from "next/link"
-import { Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function SiteHeader() {
@@ -7,8 +7,14 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Package className="size-5" />
+          <span className="flex size-10 items-center justify-center overflow-hidden rounded-lg bg-card p-0.5">
+            <Image
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7819%20%282%29-Er2qhPu9NWUVVuiK5fbV7lp0Ae0Duu.jpeg"
+              alt="ShipNexDelivery logo"
+              width={40}
+              height={40}
+              className="size-full object-contain"
+            />
           </span>
           <span className="text-lg font-semibold tracking-tight">
             Ship<span className="text-accent">Nex</span>Delivery

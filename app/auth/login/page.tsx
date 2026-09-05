@@ -1,13 +1,19 @@
+import Image from "next/image"
 import Link from "next/link"
-import { Package } from "lucide-react"
 import { LoginForm } from "@/components/login-form"
 
 export default function LoginPage() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-primary px-4 py-12">
       <Link href="/" className="mb-8 flex items-center gap-2 text-primary-foreground">
-        <span className="flex size-9 items-center justify-center rounded-lg bg-primary-foreground/10">
-          <Package className="size-5" />
+        <span className="flex size-11 items-center justify-center overflow-hidden rounded-lg bg-card p-0.5">
+          <Image
+            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7819%20%282%29-Er2qhPu9NWUVVuiK5fbV7lp0Ae0Duu.jpeg"
+            alt="ShipNexDelivery logo"
+            width={44}
+            height={44}
+            className="size-full object-contain"
+          />
         </span>
         <span className="text-lg font-semibold tracking-tight">
           Ship<span className="text-accent">Nex</span>Delivery
