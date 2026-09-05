@@ -1,8 +1,9 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Package, LayoutDashboard, Truck, LogOut } from "lucide-react"
+import { LayoutDashboard, Truck, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useTransition } from "react"
@@ -37,8 +38,14 @@ export function AdminSidebar() {
     <aside className="fixed left-0 top-0 z-40 h-dvh w-64 border-r border-border bg-card">
       <div className="flex h-16 items-center justify-center border-b border-border">
         <Link href="/admin" className="flex items-center gap-2 font-semibold">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Package className="size-4" />
+          <span className="flex size-9 items-center justify-center overflow-hidden rounded-lg bg-card p-0.5">
+              <Image
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG_7819%20%282%29-Er2qhPu9NWUVVuiK5fbV7lp0Ae0Duu.jpeg"
+                alt="ShipNexDelivery logo"
+                width={36}
+                height={36}
+                className="size-full object-contain"
+              />
           </span>
           <span className="text-sm tracking-tight">
             Ship<span className="text-accent">Nex</span>Delivery
