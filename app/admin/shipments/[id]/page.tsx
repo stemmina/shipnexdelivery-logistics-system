@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { ArrowLeft, MapPin, Calendar, FileText } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { SendUpdateEmailButton } from "@/components/admin/send-update-email-button"
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "Pending",
@@ -46,6 +47,10 @@ export default async function ShipmentDetailPage({ params }: ShipmentDetailPageP
           <h1 className="text-3xl font-bold tracking-tight">{shipment.tracking_number}</h1>
           <p className="text-muted-foreground">Shipment details and tracking information</p>
         </div>
+        <SendUpdateEmailButton
+          shipmentId={id}
+          hasRecipientEmail={Boolean(shipment.receiver_email)}
+        />
         <Button asChild>
           <Link href={`/admin/shipments/${id}/edit`}>Edit</Link>
         </Button>
@@ -90,6 +95,10 @@ export default async function ShipmentDetailPage({ params }: ShipmentDetailPageP
             <div>
               <dt className="text-sm text-muted-foreground">Receiver Name</dt>
               <dd>{shipment.receiver_name}</dd>
+            </div>
+            <div>
+              <dt className="text-sm text-muted-foreground">Receiver Email</dt>
+              <dd>{shipment.receiver_email || "Not provided"}</dd>
             </div>
             <div>
               <dt className="text-sm text-muted-foreground">Origin</dt>

@@ -5,6 +5,7 @@ export interface Shipment {
   tracking_number: string
   sender_name: string
   receiver_name: string
+  receiver_email: string | null
   origin: string
   destination: string
   current_location: string
@@ -21,6 +22,7 @@ export interface ShipmentInput {
   tracking_number: string
   sender_name: string
   receiver_name: string
+  receiver_email?: string | null
   origin: string
   destination: string
   current_location: string

@@ -9,13 +9,16 @@ import {
   updateShipmentLocation,
   updateShipmentEstimatedDelivery,
   updateShipmentAdminNotes,
+  getShipmentById,
 } from "@/lib/shipment-service"
 import { generateTrackingNumber } from "@/lib/tracking-number-generator"
+import { sendShipmentUpdateEmail } from "@/lib/email"
 
 export async function createShipmentAction(formData: {
   trackingNumber?: string
   senderName: string
   receiverName: string
+  receiverEmail?: string
   origin: string
   destination: string
   currentLocation: string
@@ -32,6 +35,7 @@ export async function createShipmentAction(formData: {
       tracking_number: trackingNumber,
       sender_name: formData.senderName,
       receiver_name: formData.receiverName,
+      receiver_email: formData.receiverEmail || null,
       origin: formData.origin,
       destination: formData.destination,
       current_location: formData.currentLocation,
@@ -61,6 +65,7 @@ export async function updateShipmentAction(
   formData: {
     senderName: string
     receiverName: string
+    receiverEmail?: string
     origin: string
     destination: string
     currentLocation: string
@@ -75,6 +80,7 @@ export async function updateShipmentAction(
     const result = await updateShipment(id, {
       sender_name: formData.senderName,
       receiver_name: formData.receiverName,
+      receiver_email: formData.receiverEmail || null,
       origin: formData.origin,
       destination: formData.destination,
       current_location: formData.currentLocation,
@@ -173,6 +179,22 @@ export async function updateEstimatedDeliveryAction(id: string, date: string) {
   } catch (error) {
     console.error("Error updating estimated delivery:", error)
     return { error: "An unexpected error occurred" }
+  }
+}
+
+export async function sendShipmentUpdateEmailAction(id: string) {
+  try {
+    const shipment = await getShipmentById(id)
+
+    if (!shipment) {
+      return { error: "Shipment not found" }
+    }
+
+    await sendShipmentUpdateEmail(shipment)
+    return { success: true }
+  } catch (error) {
+    console.error("Error sending shipment update email:", error)
+    return { error: error instanceof Error ? error.message : "Failed to send email" }
   }
 }
 

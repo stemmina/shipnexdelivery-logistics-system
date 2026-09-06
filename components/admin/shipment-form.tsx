@@ -28,6 +28,7 @@ export function ShipmentForm({ shipment, isEditing = false }: ShipmentFormProps)
     trackingNumber: shipment?.tracking_number || "",
     senderName: shipment?.sender_name || "",
     receiverName: shipment?.receiver_name || "",
+    receiverEmail: shipment?.receiver_email || "",
     origin: shipment?.origin || "",
     destination: shipment?.destination || "",
     currentLocation: shipment?.current_location || "",
@@ -55,6 +56,7 @@ export function ShipmentForm({ shipment, isEditing = false }: ShipmentFormProps)
         result = await updateShipmentAction(shipment.id, {
           senderName: formData.senderName,
           receiverName: formData.receiverName,
+          receiverEmail: formData.receiverEmail,
           origin: formData.origin,
           destination: formData.destination,
           currentLocation: formData.currentLocation,
@@ -69,6 +71,7 @@ export function ShipmentForm({ shipment, isEditing = false }: ShipmentFormProps)
           trackingNumber: autoGenerate ? undefined : formData.trackingNumber,
           senderName: formData.senderName,
           receiverName: formData.receiverName,
+          receiverEmail: formData.receiverEmail,
           origin: formData.origin,
           destination: formData.destination,
           currentLocation: formData.currentLocation,
@@ -168,6 +171,18 @@ export function ShipmentForm({ shipment, isEditing = false }: ShipmentFormProps)
             }
           />
         </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="receiverEmail">Receiver Email</Label>
+        <Input
+          id="receiverEmail"
+          type="email"
+          placeholder="recipient@example.com"
+          value={formData.receiverEmail}
+          onChange={(e) => setFormData({ ...formData, receiverEmail: e.target.value })}
+        />
+        <p className="text-xs text-muted-foreground">Used when you send a delivery update.</p>
       </div>
 
       {/* Origin & Destination */}
