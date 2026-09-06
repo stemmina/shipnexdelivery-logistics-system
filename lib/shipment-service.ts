@@ -16,6 +16,11 @@ export interface Shipment {
   admin_notes: string | null
   created_at: string
   updated_at: string
+  email_subject: string | null
+  email_body: string | null
+  email_status: "not_sent" | "sent" | "failed"
+  email_sent_at: string | null
+  email_last_error: string | null
 }
 
 export interface ShipmentInput {
@@ -31,6 +36,8 @@ export interface ShipmentInput {
   status: "pending" | "in_transit" | "out_for_delivery" | "delivered" | "cancelled"
   estimated_delivery: string
   admin_notes?: string | null
+  email_subject?: string | null
+  email_body?: string | null
 }
 
 /**
@@ -46,7 +53,9 @@ export async function getShipmentByTrackingNumber(trackingNumber: string): Promi
     .single()
 
   if (error) {
-    console.error("Error fetching shipment:", error)
+    if (error.code !== "PGRST116") {
+      console.error("Error fetching shipment:", error)
+    }
     return null
   }
 
@@ -62,7 +71,9 @@ export async function getShipmentById(id: string): Promise<Shipment | null> {
   const { data, error } = await supabase.from("shipments").select("*").eq("id", id).single()
 
   if (error) {
-    console.error("Error fetching shipment:", error)
+    if (error.code !== "PGRST116") {
+      console.error("Error fetching shipment:", error)
+    }
     return null
   }
 
@@ -214,4 +225,76 @@ export async function updateShipmentEstimatedDelivery(id: string, date: string):
  */
 export async function updateShipmentAdminNotes(id: string, notes: string): Promise<Shipment | null> {
   return updateShipment(id, { admin_notes: notes })
+}
+
+export async function updateShipmentEmailDraft(
+  id: string,
+  emailSubject: string,
+  emailBody: string,
+): Promise<Shipment | null> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from("shipments")
+    .update({ email_subject: emailSubject, email_body: emailBody, email_last_error: null })
+    .eq("id", id)
+    .select()
+    .single()
+
+  if (error) {
+    console.error("Error updating shipment email draft:", error)
+    return null
+  }
+
+  return data as Shipment
+}
+
+export async function recordShipmentEmailEvent(input: {
+  shipmentId: string
+  recipientEmail: string
+  subject: string
+  body: string
+  status: "sent" | "failed"
+  providerMessageId?: string | null
+  errorMessage?: string | null
+}) {
+  const supabase = await createClient()
+  const now = new Date().toISOString()
+  const { error: eventError } = await supabase.from("shipment_email_events").insert({
+    shipment_id: input.shipmentId,
+    recipient_email: input.recipientEmail,
+    subject: input.subject,
+    body: input.body,
+    status: input.status,
+    provider_message_id: input.providerMessageId ?? null,
+    error_message: input.errorMessage ?? null,
+  })
+
+  if (eventError) throw eventError
+
+  const { error: shipmentError } = await supabase
+    .from("shipments")
+    .update({
+      email_status: input.status,
+      email_sent_at: input.status === "sent" ? now : null,
+      email_last_error: input.errorMessage ?? null,
+    })
+    .eq("id", input.shipmentId)
+
+  if (shipmentError) throw shipmentError
+}
+
+export async function getShipmentEmailEvents(shipmentId: string) {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from("shipment_email_events")
+    .select("*")
+    .eq("shipment_id", shipmentId)
+    .order("created_at", { ascending: false })
+
+  if (error) {
+    console.error("Error fetching shipment email events:", error)
+    return []
+  }
+
+  return data ?? []
 }

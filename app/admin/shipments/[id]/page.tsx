@@ -3,7 +3,8 @@ import { notFound } from "next/navigation"
 import { ArrowLeft, MapPin, Calendar, FileText } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { SendUpdateEmailButton } from "@/components/admin/send-update-email-button"
+import { ShipmentEmailEditor } from "@/components/admin/shipment-email-editor"
+import { getShipmentEmailEvents } from "@/lib/shipment-service"
 
 const STATUS_LABELS: Record<string, string> = {
   pending: "Pending",
@@ -30,6 +31,7 @@ interface ShipmentDetailPageProps {
 export default async function ShipmentDetailPage({ params }: ShipmentDetailPageProps) {
   const { id } = await params
   const shipment = await getShipmentById(id)
+  const emailEvents = shipment ? await getShipmentEmailEvents(id) : []
 
   if (!shipment) {
     notFound()
@@ -47,10 +49,6 @@ export default async function ShipmentDetailPage({ params }: ShipmentDetailPageP
           <h1 className="text-3xl font-bold tracking-tight">{shipment.tracking_number}</h1>
           <p className="text-muted-foreground">Shipment details and tracking information</p>
         </div>
-        <SendUpdateEmailButton
-          shipmentId={id}
-          hasRecipientEmail={Boolean(shipment.receiver_email)}
-        />
         <Button asChild>
           <Link href={`/admin/shipments/${id}/edit`}>Edit</Link>
         </Button>
@@ -148,6 +146,31 @@ export default async function ShipmentDetailPage({ params }: ShipmentDetailPageP
             </div>
           </dl>
         </div>
+      </div>
+
+      <ShipmentEmailEditor shipment={shipment} />
+
+      <div className="rounded-lg border border-border bg-card p-6">
+        <h2 className="mb-4 font-semibold">Email history</h2>
+        {emailEvents.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No email attempts have been recorded.</p>
+        ) : (
+          <div className="space-y-3">
+            {emailEvents.map((event) => (
+              <div key={event.id} className="rounded-lg border border-border p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className={event.status === "sent" ? "font-medium text-emerald-700" : "font-medium text-destructive"}>
+                    {event.status === "sent" ? "Sent" : "Failed"}
+                  </span>
+                  <span className="text-xs text-muted-foreground">{new Date(event.created_at).toLocaleString()}</span>
+                </div>
+                <p className="mt-1 text-sm">{event.subject}</p>
+                <p className="text-xs text-muted-foreground">To {event.recipient_email}</p>
+                {event.error_message && <p className="mt-2 text-xs text-destructive">{event.error_message}</p>}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Admin Notes */}

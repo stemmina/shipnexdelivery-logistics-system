@@ -13,6 +13,7 @@ export function SiteHeader() {
               alt="ShipNexDelivery logo"
               width={40}
               height={40}
+              priority
               className="size-full object-contain"
             />
           </span>
