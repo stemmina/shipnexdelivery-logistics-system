@@ -28,9 +28,23 @@ export async function updateSession(request: NextRequest) {
   )
 
   // Do not run code between createServerClient and supabase.auth.getUser().
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const result = await supabase.auth.getUser()
+    user = result.data.user
+  } catch (error) {
+    // Preview sessions can contain expired or revoked refresh tokens. Clear only
+    // Supabase auth cookies so the request can recover on the next visit.
+    if (error instanceof Error && error.message.includes("Refresh Token")) {
+      for (const cookie of request.cookies.getAll()) {
+        if (cookie.name.startsWith("sb-")) {
+          supabaseResponse.cookies.delete(cookie.name)
+        }
+      }
+    } else {
+      console.error("Supabase session refresh failed:", error)
+    }
+  }
 
   // Protect the admin dashboard: redirect unauthenticated users to login.
   if (request.nextUrl.pathname.startsWith("/admin") && !user) {
