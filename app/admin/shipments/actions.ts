@@ -251,6 +251,14 @@ export async function sendShipmentEmailAction(id: string, subject?: string, body
   }
 }
 
+export async function deleteShipmentEmailDraftAction(id: string) {
+  const result = await updateShipment(id, { email_subject: null, email_body: null })
+  if (!result) return { error: "Failed to delete email draft" }
+  revalidatePath(`/admin/shipments/${id}`)
+  revalidatePath("/admin/emails")
+  return { success: true }
+}
+
 export async function getShipmentEmailEventsAction(id: string) {
   return getShipmentEmailEvents(id)
 }
