@@ -10,9 +10,13 @@ import {
   updateShipmentEstimatedDelivery,
   updateShipmentAdminNotes,
   getShipmentById,
+  updateShipmentEmailDraft,
+  recordShipmentEmailEvent,
+  getShipmentEmailEvents,
 } from "@/lib/shipment-service"
 import { generateTrackingNumber } from "@/lib/tracking-number-generator"
-import { sendShipmentUpdateEmail } from "@/lib/email"
+import { getDefaultShipmentEmail } from "@/lib/email-templates"
+import { sendShipmentEmail } from "@/lib/email"
 
 export async function createShipmentAction(formData: {
   trackingNumber?: string
@@ -31,6 +35,16 @@ export async function createShipmentAction(formData: {
   try {
     const trackingNumber = formData.trackingNumber || generateTrackingNumber()
 
+    const emailDefaults = getDefaultShipmentEmail({
+      receiver_name: formData.receiverName,
+      tracking_number: trackingNumber,
+      status: formData.status,
+      current_location: formData.currentLocation,
+      origin: formData.origin,
+      destination: formData.destination,
+      estimated_delivery: formData.estimatedDelivery,
+    })
+
     const result = await createShipment({
       tracking_number: trackingNumber,
       sender_name: formData.senderName,
@@ -44,6 +58,8 @@ export async function createShipmentAction(formData: {
       status: formData.status,
       estimated_delivery: formData.estimatedDelivery,
       admin_notes: formData.adminNotes || null,
+      email_subject: emailDefaults.subject,
+      email_body: emailDefaults.body,
     })
 
     if (!result) {
@@ -182,20 +198,57 @@ export async function updateEstimatedDeliveryAction(id: string, date: string) {
   }
 }
 
-export async function sendShipmentUpdateEmailAction(id: string) {
+export async function saveShipmentEmailDraftAction(id: string, subject: string, body: string) {
+  if (!subject.trim() || !body.trim()) return { error: "Subject and message are required" }
+  const result = await updateShipmentEmailDraft(id, subject.trim(), body.trim())
+  if (!result) return { error: "Failed to save email draft" }
+  revalidatePath(`/admin/shipments/${id}`)
+  return { success: true }
+}
+
+export async function sendShipmentEmailAction(id: string, subject?: string, body?: string) {
   try {
     const shipment = await getShipmentById(id)
+    if (!shipment) return { error: "Shipment not found" }
+    if (!shipment.receiver_email) return { error: "Add a recipient email before sending" }
 
-    if (!shipment) {
-      return { error: "Shipment not found" }
-    }
+    const emailSubject = subject?.trim() || shipment.email_subject
+    const emailBody = body?.trim() || shipment.email_body
+    if (!emailSubject || !emailBody) return { error: "Create an email draft before sending" }
 
-    await sendShipmentUpdateEmail(shipment)
+    await updateShipmentEmailDraft(id, emailSubject, emailBody)
+    const result = await sendShipmentEmail({ shipment, subject: emailSubject, body: emailBody })
+    await recordShipmentEmailEvent({
+      shipmentId: id,
+      recipientEmail: shipment.receiver_email,
+      subject: emailSubject,
+      body: emailBody,
+      status: "sent",
+      providerMessageId: result.messageId,
+    })
+
+    revalidatePath(`/admin/shipments/${id}`)
     return { success: true }
   } catch (error) {
-    console.error("Error sending shipment update email:", error)
-    return { error: error instanceof Error ? error.message : "Failed to send email" }
+    const message = error instanceof Error ? error.message : "Failed to send email"
+    try {
+      await recordShipmentEmailEvent({
+        shipmentId: id,
+        recipientEmail: "unknown",
+        subject: subject || "Shipment update",
+        body: body || "",
+        status: "failed",
+        errorMessage: message,
+      })
+    } catch {
+      // Preserve the original send error when audit logging also fails.
+    }
+    return { error: message }
   }
+}
+
+export async function getShipmentEmailEventsAction(id: string) {
+  return getShipmentEmailEvents(id)
 }
 
 export async function updateAdminNotesAction(id: string, notes: string) {

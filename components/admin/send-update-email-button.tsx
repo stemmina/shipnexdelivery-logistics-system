@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Mail, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { sendShipmentUpdateEmailAction } from "@/app/admin/shipments/actions"
+import { sendShipmentEmailAction } from "@/app/admin/shipments/actions"
 
 interface SendUpdateEmailButtonProps {
   shipmentId: string
@@ -16,7 +16,7 @@ export function SendUpdateEmailButton({ shipmentId, hasRecipientEmail }: SendUpd
 
   async function handleSend() {
     setSending(true)
-    const result = await sendShipmentUpdateEmailAction(shipmentId)
+    const result = await sendShipmentEmailAction(shipmentId)
     setSending(false)
 
     if (result.error) {
