@@ -232,14 +232,18 @@ export async function sendShipmentEmailAction(id: string, subject?: string, body
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to send email"
     try {
-      await recordShipmentEmailEvent({
-        shipmentId: id,
-        recipientEmail: "unknown",
-        subject: subject || "Shipment update",
-        body: body || "",
-        status: "failed",
-        errorMessage: message,
-      })
+      const failedShipment = await getShipmentById(id)
+      if (failedShipment?.receiver_email) {
+        await recordShipmentEmailEvent({
+          shipmentId: id,
+          recipientEmail: failedShipment.receiver_email,
+          subject: subject || failedShipment.email_subject || "Shipment update",
+          body: body || failedShipment.email_body || "",
+          status: "failed",
+          errorMessage: message,
+        })
+      }
+
     } catch {
       // Preserve the original send error when audit logging also fails.
     }

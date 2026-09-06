@@ -53,7 +53,9 @@ export async function getShipmentByTrackingNumber(trackingNumber: string): Promi
     .single()
 
   if (error) {
-    console.error("Error fetching shipment:", error)
+    if (error.code !== "PGRST116") {
+      console.error("Error fetching shipment:", error)
+    }
     return null
   }
 
@@ -69,7 +71,9 @@ export async function getShipmentById(id: string): Promise<Shipment | null> {
   const { data, error } = await supabase.from("shipments").select("*").eq("id", id).single()
 
   if (error) {
-    console.error("Error fetching shipment:", error)
+    if (error.code !== "PGRST116") {
+      console.error("Error fetching shipment:", error)
+    }
     return null
   }
 
