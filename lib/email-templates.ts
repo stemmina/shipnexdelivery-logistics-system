@@ -30,6 +30,23 @@ function nextStepForStatus(status: string) {
   return "Shipment processing"
 }
 
+export const DEFAULT_EMAIL_TEMPLATE = {
+  subject: "Your shipment update from ShipNexDelivery",
+  body: "Hello {{receiver_name}},\n\nWe are pleased to provide an update on your shipment.\n\nCurrent status: {{status}}\nTracking number: {{tracking_number}}\nCurrent location: {{current_location}}\nEstimated delivery: {{estimated_delivery}}\n\n{{tracking_url}}",
+}
+
+export function applyEmailTemplate(template: { subject: string; body: string }, shipment: Pick<Shipment, "receiver_name" | "tracking_number" | "status" | "current_location" | "estimated_delivery">) {
+  const values = {
+    receiver_name: shipment.receiver_name,
+    tracking_number: shipment.tracking_number,
+    status: formatStatus(shipment.status),
+    current_location: shipment.current_location,
+    estimated_delivery: formatDate(shipment.estimated_delivery),
+  }
+  const replace = (value: string) => value.replace(/{{\\s*([a-z_]+)\\s*}}/g, (_, key: keyof typeof values) => values[key] ?? `{{${key}}}`)
+  return { subject: replace(template.subject), body: replace(template.body) }
+}
+
 export function getDefaultShipmentEmail(
   shipment: Pick<Shipment, "receiver_name" | "tracking_number" | "status" | "current_location" | "origin" | "destination" | "estimated_delivery">,
 ) {

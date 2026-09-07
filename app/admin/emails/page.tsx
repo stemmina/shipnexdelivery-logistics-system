@@ -4,12 +4,16 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { EmailManager } from "@/components/admin/email-manager"
 import { getAllShipments } from "@/lib/shipment-service"
+import { getEmailTemplateSettings } from "@/lib/email-template-settings"
+import { DEFAULT_EMAIL_TEMPLATE } from "@/lib/email-templates"
+import { EmailTemplateSettings } from "@/components/admin/email-template-settings"
 
 export default async function AdminEmailsPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const params = await searchParams
   const query = params.q?.trim() ?? ""
   const { data: shipments, count } = await getAllShipments({ search: query, limit: 25 })
   const selected = shipments[0]
+  const settings = await getEmailTemplateSettings()
 
   return (
     <main className="space-y-6 p-6 lg:p-8">
@@ -18,6 +22,8 @@ export default async function AdminEmailsPage({ searchParams }: { searchParams: 
         <h1 className="text-3xl font-semibold tracking-tight">Shipment emails</h1>
         <p className="max-w-2xl text-muted-foreground">Search for a shipment, create or edit its official ShipNexDelivery email, then save, delete, or send it to the recipient.</p>
       </header>
+
+      <EmailTemplateSettings initialSettings={settings ?? { ...DEFAULT_EMAIL_TEMPLATE, updated_at: new Date().toISOString() }} />
 
       <section className="rounded-xl border border-border bg-card p-5 shadow-sm">
         <form className="flex flex-col gap-3 sm:flex-row" action="/admin/emails">
