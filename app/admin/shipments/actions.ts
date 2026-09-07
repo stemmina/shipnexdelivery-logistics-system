@@ -15,8 +15,9 @@ import {
   getShipmentEmailEvents,
 } from "@/lib/shipment-service"
 import { generateTrackingNumber } from "@/lib/tracking-number-generator"
-import { getDefaultShipmentEmail } from "@/lib/email-templates"
+import { applyEmailTemplate, getDefaultShipmentEmail } from "@/lib/email-templates"
 import { sendShipmentEmail } from "@/lib/email"
+import { getEmailTemplateSettings, saveEmailTemplateSettings } from "@/lib/email-template-settings"
 
 export async function createShipmentAction(formData: {
   trackingNumber?: string
@@ -35,15 +36,24 @@ export async function createShipmentAction(formData: {
   try {
     const trackingNumber = formData.trackingNumber || generateTrackingNumber()
 
-    const emailDefaults = getDefaultShipmentEmail({
-      receiver_name: formData.receiverName,
-      tracking_number: trackingNumber,
-      status: formData.status,
-      current_location: formData.currentLocation,
-      origin: formData.origin,
-      destination: formData.destination,
-      estimated_delivery: formData.estimatedDelivery,
-    })
+    const emailSettings = await getEmailTemplateSettings()
+    const emailDefaults = emailSettings
+      ? applyEmailTemplate(emailSettings, {
+          receiver_name: formData.receiverName,
+          tracking_number: trackingNumber,
+          status: formData.status,
+          current_location: formData.currentLocation,
+          estimated_delivery: formData.estimatedDelivery,
+        })
+      : getDefaultShipmentEmail({
+          receiver_name: formData.receiverName,
+          tracking_number: trackingNumber,
+          status: formData.status,
+          current_location: formData.currentLocation,
+          origin: formData.origin,
+          destination: formData.destination,
+          estimated_delivery: formData.estimatedDelivery,
+        })
 
     const result = await createShipment({
       tracking_number: trackingNumber,
@@ -261,6 +271,18 @@ export async function deleteShipmentEmailDraftAction(id: string) {
 
 export async function getShipmentEmailEventsAction(id: string) {
   return getShipmentEmailEvents(id)
+}
+
+export async function getEmailTemplateSettingsAction() {
+  return getEmailTemplateSettings()
+}
+
+export async function saveEmailTemplateSettingsAction(subject: string, body: string) {
+  if (!subject.trim() || !body.trim()) return { error: "Subject and message are required" }
+  const settings = await saveEmailTemplateSettings(subject.trim(), body.trim())
+  if (!settings) return { error: "Failed to save the official template" }
+  revalidatePath("/admin/emails")
+  return { success: true, settings }
 }
 
 export async function updateAdminNotesAction(id: string, notes: string) {
