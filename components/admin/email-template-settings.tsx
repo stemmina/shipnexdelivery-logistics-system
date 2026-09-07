@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { RotateCcw, Save } from "lucide-react"
+import { EmailPreview } from "@/components/admin/email-preview"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -9,8 +10,9 @@ import { Label } from "@/components/ui/label"
 import { DEFAULT_EMAIL_TEMPLATE } from "@/lib/email-templates"
 import { saveEmailTemplateSettingsAction } from "@/app/admin/shipments/actions"
 import type { EmailTemplateSettings } from "@/lib/email-template-settings"
+import type { Shipment } from "@/lib/shipment-service"
 
-export function EmailTemplateSettings({ initialSettings }: { initialSettings: EmailTemplateSettings }) {
+export function EmailTemplateSettings({ initialSettings, previewShipment }: { initialSettings: EmailTemplateSettings; previewShipment?: Shipment }) {
   const [subject, setSubject] = useState(initialSettings.subject)
   const [body, setBody] = useState(initialSettings.body)
   const [message, setMessage] = useState("")
@@ -49,6 +51,7 @@ export function EmailTemplateSettings({ initialSettings }: { initialSettings: Em
           <Button type="button" variant="outline" onClick={() => { setSubject(DEFAULT_EMAIL_TEMPLATE.subject); setBody(DEFAULT_EMAIL_TEMPLATE.body); setMessage(""); setError("") }} disabled={isPending}><RotateCcw className="mr-2 size-4" />Restore built-in template</Button>
           <Button type="button" onClick={save} disabled={isPending || !subject.trim() || !body.trim()}><Save className="mr-2 size-4" />Save official template</Button>
         </div>
+        {previewShipment && <EmailPreview shipment={previewShipment} subject={subject} body={body} />}
       </div>
     </section>
   )

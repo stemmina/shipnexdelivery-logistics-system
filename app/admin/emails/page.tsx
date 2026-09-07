@@ -23,7 +23,10 @@ export default async function AdminEmailsPage({ searchParams }: { searchParams: 
         <p className="max-w-2xl text-muted-foreground">Search for a shipment, create or edit its official ShipNexDelivery email, then save, delete, or send it to the recipient.</p>
       </header>
 
-      <EmailTemplateSettings initialSettings={settings ?? { ...DEFAULT_EMAIL_TEMPLATE, updated_at: new Date().toISOString() }} />
+      <EmailTemplateSettings
+        initialSettings={settings ?? { ...DEFAULT_EMAIL_TEMPLATE, updated_at: new Date().toISOString() }}
+        previewShipment={selected}
+      />
 
       <section className="rounded-xl border border-border bg-card p-5 shadow-sm">
         <form className="flex flex-col gap-3 sm:flex-row" action="/admin/emails">
