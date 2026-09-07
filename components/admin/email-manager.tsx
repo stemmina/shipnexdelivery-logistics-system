@@ -72,7 +72,7 @@ export function EmailManager({ shipment }: { shipment: Shipment }) {
           <Textarea id="email-body" value={body} onChange={(event) => setBody(event.target.value)} rows={12} className="font-mono text-sm" placeholder="Write the shipment update..." />
           <p className="text-xs text-muted-foreground">Use <code>{"{{tracking_url}}"}</code> to insert the tracking page link.</p>
         </div>
-        <EmailPreview shipment={shipment} body={body} />
+        <EmailPreview shipment={shipment} body={body} subject={subject} />
         {(message || error) && <p className={error ? "text-sm text-destructive" : "text-sm text-emerald-700"}>{error || message}</p>}
         <div className="flex flex-wrap gap-2">
           <Button type="button" variant="outline" onClick={reset} disabled={isPending}><RotateCcw className="mr-2 size-4" />Reset official template</Button>
