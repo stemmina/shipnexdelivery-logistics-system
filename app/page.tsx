@@ -54,7 +54,16 @@ export default function HomePage() {
         {/* Hero */}
         <section className="relative overflow-hidden">
           <div className="absolute inset-0">
-            <Image src="/hero-logistics.png" alt="" fill priority className="object-cover" />
+            <div className="relative size-full">
+              <Image
+                src="/hero-logistics.png"
+                alt=""
+                width={1920}
+                height={1080}
+                priority
+                className="size-full object-cover"
+              />
+            </div>
             <div className="absolute inset-0 bg-primary/85" />
           </div>
 
