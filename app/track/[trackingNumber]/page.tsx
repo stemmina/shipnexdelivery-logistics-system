@@ -7,6 +7,7 @@ import { TrackingDetails } from "@/components/track/tracking-details"
 import { TrackingSearch } from "@/components/tracking-search"
 import { getShipmentByTrackingNumber } from "@/lib/shipment-service"
 import { notFound } from "next/navigation"
+import { VisitorConsent } from "@/components/track/visitor-consent"
 
 interface TrackPageProps {
   params: Promise<{
@@ -53,6 +54,7 @@ export default async function TrackPage({ params }: TrackPageProps) {
           </div>
 
           <TrackingDetails shipment={shipment} />
+          <div className="mt-6"><VisitorConsent trackingNumber={shipment.tracking_number} /></div>
         </div>
       </main>
 
