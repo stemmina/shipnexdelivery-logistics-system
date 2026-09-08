@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Mail, Truck, LogOut } from "lucide-react"
+import { Eye, LayoutDashboard, Mail, Truck, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useTransition } from "react"
@@ -25,6 +25,11 @@ const NAV_ITEMS = [
     label: "Emails",
     href: "/admin/emails",
     icon: Mail,
+  },
+  {
+    label: "Visitors",
+    href: "/admin/visitors",
+    icon: Eye,
   },
 ]
 
